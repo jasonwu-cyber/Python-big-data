@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python 大數據分析與應用指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Slate & Indigo/Teal Accents -->
+    <!-- Application Structure Plan: The SPA uses a modular, dashboard-like structure. It breaks down the comprehensive report into digestible, interactive sections: 1. Ecosystem Cards (for quick overview of tools), 2. Interactive Lifecycle Tabs (to walk through the sequential process without overwhelming text), 3. Scaling Solutions Chart (visualizing the sweet spot of different big data tools), 4. Application Scenarios Interactive Doughnut (engaging way to explore industry impact), and 5. Learning Path Timeline. This non-linear, exploratory approach improves user retention and understanding of complex data science concepts. -->
+    <!-- Visualization & Content Choices: 
+         - Ecosystem -> Grid Cards (Goal: Organize/Inform. Method: HTML/Tailwind. Interaction: Hover. Justification: Quick scanning of core tools).
+         - Lifecycle -> Interactive Tabs (Goal: Inform/Process. Method: JS Tabs. Interaction: Click to reveal. Justification: Sequential processes are best consumed step-by-step).
+         - Big Data Scaling -> Horizontal Bar Chart (Goal: Compare. Method: Chart.js. Interaction: Tooltips. Justification: Visually comparing capacity limits of Pandas vs PySpark).
+         - Applications -> Doughnut Chart + Dynamic Text (Goal: Explore. Method: Chart.js + JS Text Update. Interaction: Click chart slices. Justification: Makes reading industry use-cases engaging).
+         - Learning Path -> Vertical Timeline (Goal: Organize. Method: Styled HTML. Interaction: None. Justification: Clear, structured roadmap).
+         - ALL methods confirm NO SVG/Mermaid. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (max-width: 640px) { .chart-container { height: 250px; } }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .tab-active { border-left-color: #4f46e5; background-color: #e0e7ff; color: #312e81; font-weight: 700; }
+        .tab-inactive { border-left-color: transparent; background-color: transparent; color: #475569; }
+        .timeline-line::before { content: ''; position: absolute; left: 1.25rem; top: 0; bottom: 0; width: 2px; background-color: #cbd5e1; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav class="sticky top-0 z-50 glass-card shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center font-bold text-xl text-indigo-700">
+                    🐍 PyData Insight
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#ecosystem" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">核心技術棧</a>
+                    <a href="#lifecycle" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">分析生命週期</a>
+                    <a href="#scaling" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">大數據方案</a>
+                    <a href="#applications" class="text-slate-600 hover:text-indigo-600 font-medium transition-colors">應用場景</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+        <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">Python 大數據分析與應用指南</h1>
+        <p class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            Python 已成為大數據領域的主流語言，其強大的生態系統讓數據科學家能從原始資料中萃取價值。本互動指南整理了 Python 在大數據分析中的核心技術、細部應用流程及其對產業的深遠影響，帶您系統化掌握數據科學的關鍵知識。
+        </p>
+    </header>
+
+    <section id="ecosystem" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="mb-10 text-center">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">1. 核心技術棧 (The Ecosystem)</h2>
+            <p class="text-slate-600 max-w-2xl mx-auto">大數據分析的基礎建立在幾個高度優化且互相協作的函式庫之上。此區塊展示了構成完整數據科學環的四大支柱，點擊或懸停以探索各工具的獨特優勢。</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition-all cursor-default group">
+                <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🔢</div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">NumPy</h3>
+                <h4 class="text-sm font-semibold text-indigo-600 mb-3">Numerical Python</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">提供高效的多維陣列運算（ndarray）與廣泛的數學函數庫。它是幾乎所有科學運算的基礎，透過向量化運算（Vectorization）大幅提升處理速度，避開 Python 原生循環的效能瓶頸。</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition-all cursor-default group">
+                <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🐼</div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Pandas</h3>
+                <h4 class="text-sm font-semibold text-indigo-600 mb-3">數據分析核心</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">提供 DataFrame 結構。擅長處理標籤化數據、複雜表格整合、時間序列分析與缺失值處理。其強大在於靈活的索引與分組（Groupby）機制，讓清理異質數據變得直觀且高效。</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition-all cursor-default group">
+                <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">📊</div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Matplotlib / Seaborn</h3>
+                <h4 class="text-sm font-semibold text-indigo-600 mb-3">數據視覺化基石</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">Matplotlib 提供底層圖表控制，Seaborn 則封裝了更高級的統計圖表介面。能將枯燥數據轉換為直觀趨勢線、分布圖與熱力圖，輔助決策者快速掌握現況。</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition-all cursor-default group">
+                <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">🧠</div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Scikit-learn</h3>
+                <h4 class="text-sm font-semibold text-indigo-600 mb-3">機器學習標準庫</h4>
+                <p class="text-slate-600 text-sm leading-relaxed">提供一致的 API 介面，包含線性回歸、隨機森林、SVM 等演算法。同時封裝了模型評估與預處理工具，是進入人工智慧領域的必備跳板。</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="lifecycle" class="bg-slate-100 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 md:text-center text-left">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">2. 大數據分析生命週期</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">一個成功的大數據分析專案是一個嚴謹的科學探究流程。請點擊左側的各個階段，以互動方式了解從數據獲取到模型預測的具體步驟與技術細節。</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <div class="w-full md:w-1/3 flex flex-col space-y-2 border-r border-slate-100 pr-0 md:pr-4" id="lifecycle-tabs">
+                    <button class="text-left px-5 py-4 border-l-4 rounded-r-xl transition-all tab-active" data-target="stage-1">
+                        <div class="font-bold text-lg mb-1">第一階段</div>
+                        <div class="text-sm">數據獲取 (Acquisition)</div>
+                    </button>
+                    <button class="text-left px-5 py-4 border-l-4 rounded-r-xl transition-all tab-inactive hover:bg-slate-50" data-target="stage-2">
+                        <div class="font-bold text-lg mb-1">第二階段</div>
+                        <div class="text-sm">數據清洗與預處理 (Cleaning)</div>
+                    </button>
+                    <button class="text-left px-5 py-4 border-l-4 rounded-r-xl transition-all tab-inactive hover:bg-slate-50" data-target="stage-3">
+                        <div class="font-bold text-lg mb-1">第三階段</div>
+                        <div class="text-sm">探索性數據分析 (EDA)</div>
+                    </button>
+                    <button class="text-left px-5 py-4 border-l-4 rounded-r-xl transition-all tab-inactive hover:bg-slate-50" data-target="stage-4">
+                        <div class="font-bold text-lg mb-1">第四階段</div>
+                        <div class="text-sm">模型建模與預測 (Modeling)</div>
+                    </button>
+                </div>
+
+                <div class="w-full md:w-2/3 p-4 md:p-8 flex items-center bg-slate-50 rounded-2xl" id="lifecycle-content">
+                    <div id="stage-1" class="block animate-fade-in">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center"><span class="text-3xl mr-3">🌐</span> 數據獲取 (Data Acquisition)</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">這是分析流程的起點，目標是從各種來源收集原始資料。</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-700 p-1 rounded mr-3 text-xs font-bold mt-1">API</span>
+                                <div>
+                                    <strong class="text-slate-800">外部 API 與 Web 服務：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">使用 <code class="bg-slate-200 px-1 rounded">requests</code> 或 <code class="bg-slate-200 px-1 rounded">urllib</code> 調用 RESTful API，獲取即時金融數據或天氣資訊。這是現代軟體整合數據最常見的方式。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-700 p-1 rounded mr-3 text-xs font-bold mt-1">WEB</span>
+                                <div>
+                                    <strong class="text-slate-800">網頁爬蟲技術：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">使用 <code class="bg-slate-200 px-1 rounded">BeautifulSoup</code> 解析 HTML，或用 <code class="bg-slate-200 px-1 rounded">Scrapy</code> 建構大規模自動化抓取系統，將非結構化網頁轉為結構化數據。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-indigo-100 text-indigo-700 p-1 rounded mr-3 text-xs font-bold mt-1">DB</span>
+                                <div>
+                                    <strong class="text-slate-800">資料庫連接與 I/O：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">透過 <code class="bg-slate-200 px-1 rounded">SQLAlchemy</code> 連結 MySQL/PostgreSQL，或使用 <code class="bg-slate-200 px-1 rounded">PyMongo</code> 處理 NoSQL 數據，實現與企業系統無縫對接。</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="stage-2" class="hidden animate-fade-in">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center"><span class="text-3xl mr-3">🧹</span> 數據清洗與預處理 (Data Cleaning)</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">現實世界的數據往往充滿雜訊，此階段決定了後續分析的準確性。</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <span class="bg-teal-100 text-teal-700 p-1 rounded mr-3 text-xs font-bold mt-1">QA</span>
+                                <div>
+                                    <strong class="text-slate-800">數據質量維護：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">包含處理缺失值（如平均值填充或預測填充）、識別並修正離群值（Outliers），以及確保數據的一致性。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-teal-100 text-teal-700 p-1 rounded mr-3 text-xs font-bold mt-1">FE</span>
+                                <div>
+                                    <strong class="text-slate-800">特徵工程 (Feature Engineering)：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">模型成功的關鍵。包括類別變數的 One-Hot 編碼、連續變數縮放（Min-Max/Z-score），以及創造新的交互特徵（Interaction Features）。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-teal-100 text-teal-700 p-1 rounded mr-3 text-xs font-bold mt-1">JOIN</span>
+                                <div>
+                                    <strong class="text-slate-800">資料整合與重塑：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">利用 <code class="bg-slate-200 px-1 rounded">merge</code>, <code class="bg-slate-200 px-1 rounded">join</code> 或 <code class="bg-slate-200 px-1 rounded">pivot_table</code> 進行多表關聯，將分散系統的資訊拼湊成完整分析視角。</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="stage-3" class="hidden animate-fade-in">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center"><span class="text-3xl mr-3">🔍</span> 探索性數據分析 (EDA)</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">在建模前，透過統計與視覺化深入了解數據的內在規律與潛在問題。</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <span class="bg-amber-100 text-amber-700 p-1 rounded mr-3 text-xs font-bold mt-1">STAT</span>
+                                <div>
+                                    <strong class="text-slate-800">描述性統計分析：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">透過 <code class="bg-slate-200 px-1 rounded">df.describe()</code> 快速獲取均值、中位數、標準差等關鍵指標，理解數據的中心趨勢與離散程度。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-amber-100 text-amber-700 p-1 rounded mr-3 text-xs font-bold mt-1">CORR</span>
+                                <div>
+                                    <strong class="text-slate-800">多變量分析：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">使用相關係數矩陣與熱力圖（Heatmap）找出特徵間的共線性，這對於後續模型的特徵選擇至關重要。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-amber-100 text-amber-700 p-1 rounded mr-3 text-xs font-bold mt-1">DIST</span>
+                                <div>
+                                    <strong class="text-slate-800">數據分佈洞察：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">透過直方圖觀察數據是否符合常態分佈，或利用箱形圖檢視資料的分布範圍與潛在異常。</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="stage-4" class="hidden animate-fade-in">
+                        <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center"><span class="text-3xl mr-3">🤖</span> 模型建模與預測</h3>
+                        <p class="text-slate-600 mb-6 leading-relaxed">運用機器學習演算法，從歷史數據中學習模式，以進行分類、預測或分群。</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <span class="bg-rose-100 text-rose-700 p-1 rounded mr-3 text-xs font-bold mt-1">SUP</span>
+                                <div>
+                                    <strong class="text-slate-800">監督式學習：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">運用已知標籤的數據訓練。例如使用隨機森林（Random Forest）進行分類，或使用梯度提升機（XGBoost/LightGBM）解決複雜預測問題。</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-rose-100 text-rose-700 p-1 rounded mr-3 text-xs font-bold mt-1">UNS</span>
+                                <div>
+                                    <strong class="text-slate-800">非監督式學習：</strong>
+                                    <p class="text-slate-600 text-sm mt-1">在無標籤情況下發現隱含模式。例如利用 K-Means 進行客戶細分，或使用主成分分析（PCA）降維以簡化模型。</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="scaling" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="mb-10 text-center">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">3. 處理「大」數據的進階方案</h2>
+            <p class="text-slate-600 max-w-2xl mx-auto mb-8">當數據量從 GB 級增長至 TB 甚至 PB 級，傳統的單機內存處理方式將失效，需引入橫向擴展（Scale-out）的概念。下方圖表展示了不同工具的適用數據規模與特性。</p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8 items-center">
+            <div class="w-full lg:w-1/2">
+                <div class="chart-container">
+                    <canvas id="scalingChart"></canvas>
+                </div>
+            </div>
+            <div class="w-full lg:w-1/2 space-y-6">
+                <div class="bg-white p-5 rounded-xl border-l-4 border-indigo-500 shadow-sm">
+                    <h4 class="text-lg font-bold text-slate-800 flex items-center justify-between">SQLite / DuckDB <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">中型數據 (GB)</span></h4>
+                    <p class="text-slate-600 text-sm mt-2">DuckDB 被譽為「數據分析界的 SQLite」，採用列式儲存。在執行 SQL 查詢時提供極致性能，無需安裝複雜伺服器環境，適合處理大於記憶體但可存放於單顆硬碟的資料。</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border-l-4 border-teal-500 shadow-sm">
+                    <h4 class="text-lg font-bold text-slate-800 flex items-center justify-between">Dask <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">大型數據 (100GB - TB)</span></h4>
+                    <p class="text-slate-600 text-sm mt-2">專為 Python 量身打造。能將 Pandas 或 NumPy 邏輯分解為微型任務圖，在多核 CPU 或分佈式集群運行，適合在有限資源下處理超大型 DataFrame，語法學習成本低。</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border-l-4 border-amber-500 shadow-sm">
+                    <h4 class="text-lg font-bold text-slate-800 flex items-center justify-between">PySpark <span class="text-xs bg-slate-100 text-slate-500 px-2 py-1 rounded">巨量數據 (TB - PB)</span></h4>
+                    <p class="text-slate-600 text-sm mt-2">Apache Spark 的 Python 介面。採用分散式記憶體運算架構，能將任務拆分至數百台伺服器並行執行，是處理企業級巨型數據集群的首選工業標準。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="applications" class="bg-slate-800 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold mb-4">4. 常見應用場景與社會影響</h2>
+                <p class="text-slate-300 max-w-2xl mx-auto">大數據技術正深刻改變各行各業。點擊下方的環形圖區塊，探索 Python 數據分析在不同領域的實際應用案例與業務影響力。</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-12 items-center justify-center">
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="chart-container" style="max-height: 350px;">
+                        <canvas id="applicationsChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-1/2">
+                    <div id="app-detail-card" class="bg-slate-700 p-8 rounded-2xl border border-slate-600 transition-all duration-300 min-h-[250px] flex flex-col justify-center">
+                        <div class="text-5xl mb-4" id="app-icon">💡</div>
+                        <h3 class="text-2xl font-bold text-white mb-3" id="app-title">請點擊左側圖表區塊</h3>
+                        <p class="text-slate-300 leading-relaxed text-lg" id="app-desc">探索 Python 大數據技術在不同產業中如何創造商業價值與社會影響力。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 mb-12">
+        <div class="mb-12 text-center">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">5. 學習路徑建議：從新手到專家</h2>
+            <p class="text-slate-600">透過持續的實踐與學習，您將能在大數據時代中洞察先機。以下是系統化的成長藍圖。</p>
+        </div>
+
+        <div class="relative timeline-line space-y-8 pb-4">
+            <div class="relative pl-12">
+                <div class="absolute left-0 top-1 w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full border-4 border-white shadow-sm flex items-center justify-center font-bold z-10">1</div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h4 class="text-xl font-bold text-slate-800 mb-2">語言基礎</h4>
+                    <p class="text-slate-600 text-sm">徹底理解 Python 的動態類型、物件導向特性以及核心資料結構（List, Dict, Set）。這是開發穩健腳本、確保後續數據處理不會出錯的絕對前提。</p>
+                </div>
+            </div>
+
+            <div class="relative pl-12">
+                <div class="absolute left-0 top-1 w-10 h-10 bg-teal-100 text-teal-600 rounded-full border-4 border-white shadow-sm flex items-center justify-center font-bold z-10">2</div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h4 class="text-xl font-bold text-slate-800 mb-2">數據工具鏈</h4>
+                    <p class="text-slate-600 text-sm">精通 Pandas 的鏈式操作（Method Chaining）與數據重組技術。學會如何優化 Pandas 記憶體佔用（如轉換資料型態），這在處理中大型資料時極其重要。</p>
+                </div>
+            </div>
+
+            <div class="relative pl-12">
+                <div class="absolute left-0 top-1 w-10 h-10 bg-amber-100 text-amber-600 rounded-full border-4 border-white shadow-sm flex items-center justify-center font-bold z-10">3</div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h4 class="text-xl font-bold text-slate-800 mb-2">數學與理論支撐</h4>
+                    <p class="text-slate-600 text-sm">數據分析的靈魂在於統計。建議補強假設檢定、概率分佈、線性代數與微積分。這些硬知識將幫助你真正理解機器學習演算法底層的損失函數與優化器，而非盲目調包。</p>
+                </div>
+            </div>
+
+            <div class="relative pl-12">
+                <div class="absolute left-0 top-1 w-10 h-10 bg-rose-100 text-rose-600 rounded-full border-4 border-white shadow-sm flex items-center justify-center font-bold z-10">4</div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h4 class="text-xl font-bold text-slate-800 mb-2">專案實戰與社群交流</h4>
+                    <p class="text-slate-600 text-sm">參與 Kaggle 數據科學競賽，學習他人的 Notebook 技巧，培養對真實世界數據的敏銳度。或者在 GitHub 上貢獻開源數據處理工具，從實踐中累積解決現實問題的工程經驗。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center text-sm">
+        <p>本文件旨在提供 Python 大數據分析的全方位深度導引。由 AI 依據原報告自動生成之互動式 SPA。</p>
+    </footer>
+
+    <script>
+        // --- 1. Lifecycle Tabs Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('#lifecycle-tabs button');
+            const contents = document.querySelectorAll('#lifecycle-content > div');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Reset all tabs
+                    tabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.add('tab-inactive', 'hover:bg-slate-50');
+                    });
+                    // Hide all contents
+                    contents.forEach(c => {
+                        c.classList.add('hidden');
+                        c.classList.remove('block');
+                    });
+
+                    // Set active tab
+                    tab.classList.add('tab-active');
+                    tab.classList.remove('tab-inactive', 'hover:bg-slate-50');
+                    
+                    // Show target content
+                    const targetId = tab.getAttribute('data-target');
+                    const targetContent = document.getElementById(targetId);
+                    targetContent.classList.remove('hidden');
+                    targetContent.classList.add('block');
+                });
+            });
+        });
+
+        // --- 2. Chart.js: Scaling Solutions Bar Chart ---
+        const ctxScaling = document.getElementById('scalingChart').getContext('2d');
+        new Chart(ctxScaling, {
+            type: 'bar',
+            data: {
+                labels: ['標準 Pandas', 'DuckDB', 'Dask', 'PySpark'],
+                datasets: [{
+                    label: '資料處理規模能力 (概念分數)',
+                    data: [15, 35, 70, 100], // Conceptual scaling values
+                    backgroundColor: [
+                        'rgba(148, 163, 184, 0.6)', // Slate for Pandas
+                        'rgba(99, 102, 241, 0.7)',  // Indigo for DuckDB
+                        'rgba(20, 184, 166, 0.7)',  // Teal for Dask
+                        'rgba(245, 158, 11, 0.7)'   // Amber for PySpark
+                    ],
+                    borderColor: [
+                        'rgb(148, 163, 184)',
+                        'rgb(99, 102, 241)',
+                        'rgb(20, 184, 166)',
+                        'rgb(245, 158, 11)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // Make it a horizontal bar chart
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const capacities = [
+                                    '單機記憶體限制 (通常 < 10GB)',
+                                    '單機磁碟極限 (可達 100GB+)',
+                                    '多核/叢集 (TB 級別)',
+                                    '大型分散式叢集 (PB 級別)'
+                                ];
+                                return ' 適用規模: ' + capacities[context.dataIndex];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: false, // Hide x axis to focus on relative scale conceptually
+                        max: 110
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { font: { family: "'Noto Sans TC', sans-serif", size: 14, weight: 'bold' } }
+                    }
+                }
+            }
+        });
+
+        // --- 3. Chart.js: Applications Doughnut Chart with Interaction ---
+        const appData = [
+            {
+                label: '金融科技 (FinTech)',
+                icon: '💰',
+                desc: '透過分析毫秒級的交易流水進行即時詐欺偵測，或利用機器學習模型評估用戶信用等級，實現自動化授信與風險控管。',
+                color: '#6366f1' // indigo-500
+            },
+            {
+                label: '電子商務與零售',
+                icon: '🛒',
+                desc: '構建個人化推薦引擎（Recommendation Engine），根據用戶瀏覽歷史預測購買行為；同時分析供應鏈數據以精準優化庫存管理。',
+                color: '#14b8a6' // teal-500
+            },
+            {
+                label: '智慧製造 (Industry 4.0)',
+                icon: '🏭',
+                desc: '監控工業感測器數據以進行預防性維護（Predictive Maintenance），在設備故障發生前發出預警，大幅降低生產停機成本。',
+                color: '#f59e0b' // amber-500
+            },
+            {
+                label: '公共健康與社群',
+                icon: '🌍',
+                desc: '利用情緒分析技術監控社群媒體趨勢，從而快速響應公眾舆論；或透過疫情數據、醫療紀錄建模，輔助公共防疫政策的制定。',
+                color: '#f43f5e' // rose-500
+            }
+        ];
+
+        const ctxApp = document.getElementById('applicationsChart').getContext('2d');
+        const appChart = new Chart(ctxApp, {
+            type: 'doughnut',
+            data: {
+                labels: appData.map(d => d.label),
+                datasets: [{
+                    data: [25, 25, 25, 25], // Equal distribution for purely visual UI purpose
+                    backgroundColor: appData.map(d => d.color),
+                    borderWidth: 2,
+                    borderColor: '#1e293b', // Match background
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#cbd5e1', font: { family: "'Noto Sans TC', sans-serif" } }
+                    },
+                    tooltip: {
+                        enabled: false // Disable default tooltip, use custom interaction
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        updateAppDetail(index);
+                    }
+                },
+                onHover: (event, elements) => {
+                    event.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+                }
+            }
+        });
+
+        // Function to update the application detail card
+        function updateAppDetail(index) {
+            const data = appData[index];
+            const card = document.getElementById('app-detail-card');
+            const icon = document.getElementById('app-icon');
+            const title = document.getElementById('app-title');
+            const desc = document.getElementById('app-desc');
+
+            // Simple animation effect
+            card.style.opacity = '0.5';
+            card.style.transform = 'scale(0.98)';
+            
+            setTimeout(() => {
+                icon.textContent = data.icon;
+                title.textContent = data.label;
+                title.style.color = data.color;
+                desc.textContent = data.desc;
+                
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }, 150);
+        }
+        
+        // Auto-select first item on load
+        updateAppDetail(0);
+
+    </script>
+</body>
+</html>
